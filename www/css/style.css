@@ -2,3 +2,15 @@
 .textAlignCenter{
 	text-align: center;
 }
+
+.tr-background{
+	margin: 0px;
+	height: 800px;
+	background: -webkit-linear-gradient(top, #0b4f4f 0%,#82bfb7 100%); /* Chrome10+,Safari5.1+ */
+	text-align: center;
+}
+
+
+.logo{
+	margin-top: 300px;
+}

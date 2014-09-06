@@ -1,5 +1,9 @@
 var addressKey = "address";
 
+var tiCensorTagDeviceGeneralUuid = "5F603DE9-1526-C526-0EB5-6F9857A6EBC0";
+
+var tempServiceUuid = "F000AA00-0451-4000-B000-000000000000";
+
 var heartRateServiceUuid = "180d";
 var heartRateMeasurementCharacteristicUuid = "2a37";
 var clientCharacteristicConfigDescriptorUuid = "2902";
@@ -12,22 +16,35 @@ var reconnectTimer = null;
 
 var iOSPlatform = "iOS";
 var androidPlatform = "Android";
+var myDefered;
 
-bluetoothle.initialize(initializeSuccess, initializeError);
+function discoverDevices(defered){
+  myDefered = defered;
+
+  bluetoothle.initialize(initializeSuccess, initializeError);
+}
+
 
 function initializeSuccess(obj)
 {
+  console.log("initSuccess...");
   if (obj.status == "enabled")
   {
     var address = window.localStorage.getItem(addressKey);
-    if (address == null)
-    {
-        console.log("Bluetooth initialized successfully, starting scan for heart rate devices.");
-        var paramsObj = {"serviceUuids":[heartRateServiceUuid]};
+    
+    // not to remember address
+    address = null;
+
+    if (address === null)
+    { 
+        console.log("No existed address, start to initial ble.");
+        console.log("Bluetooth initialized successfully, starting scan for censor devices.");
+        var paramsObj = {"serviceUuids":[]}; //left blank to sscan all
         bluetoothle.startScan(startScanSuccess, startScanError, paramsObj);
     }
     else
     {
+        console.log("connect to address: "+address);
         connectDevice(address);
     }
   }
@@ -46,12 +63,17 @@ function startScanSuccess(obj)
 {
   if (obj.status == "scanResult")
   {
+    console.log("scaned device:"+ obj.name +" rssi="+obj.rssi + " address=" +obj.address);
+    var devices = 
+    [{ id: 0, name: obj.name, address: obj.address, rssi:obj.rssi }];
+    myDefered.resolve(devices);
     console.log("Stopping scan..");
     bluetoothle.stopScan(stopScanSuccess, stopScanError);
     clearScanTimeout();
+    return myDefered.promise;
 
-    window.localStorage.setItem(addressKey, obj.address);
-        connectDevice(obj.address);
+    // window.localStorage.setItem(addressKey, obj.address);
+    //     connectDevice(obj.address);
   }
   else if (obj.status == "scanStarted")
   {
@@ -78,7 +100,7 @@ function scanTimeout()
 function clearScanTimeout()
 { 
     console.log("Clearing scanning timeout");
-  if (scanTimer != null)
+  if (scanTimer !== null)
   {
     clearTimeout(scanTimer);
   }
@@ -144,7 +166,7 @@ function connectTimeout()
 function clearConnectTimeout()
 { 
     console.log("Clearing connect timeout");
-  if (connectTimer != null)
+  if (connectTimer !== null)
   {
     clearTimeout(connectTimer);
   }
@@ -230,7 +252,7 @@ function reconnectTimeout()
 function clearReconnectTimeout()
 { 
     console.log("Clearing reconnect timeout");
-  if (reconnectTimer != null)
+  if (reconnectTimer !== null)
   {
     clearTimeout(reconnectTimer);
   }
@@ -446,7 +468,7 @@ function subscribeSuccess(obj)
         var bytes = bluetoothle.encodedStringToBytes(obj.value);
 
         //Check for data
-        if (bytes.length == 0)
+        if (bytes.length === 0)
         {
             console.log("Subscription result had zero length data");
             return;

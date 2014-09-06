@@ -1,9 +1,7 @@
 <ion-view title="QR-Scan">
   <ion-content class="has-header padding">
-    <a href="#" class="button button-positive" ng-click="doScan()">QR Scan</a>
-    <p> Text: {{scanResult0}} <br>
-    	Format : {{scanResult1}}<br>
-    	Cancelled: {{scanResult2}}</p>
-    <a href="#" class="button" ng-click="openBrowser('{{scanResult0}}')">Go</a>
+    <a href="#" class="button button-bar button-positive" ng-click="doScan()">QR Scan</a>
+    <p> <h3> {{scanResult0}} <h3><br></p>
+    <a href="#" class="button button-bar" ng-click="openBrowser('{{scanResult0}}')">Go</a>
   </ion-content>
 </ion-view>

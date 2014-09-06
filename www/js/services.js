@@ -27,7 +27,7 @@ angular.module('starter.services', [])
   };
 })
 
-.factory('BletagService', function() {
+.factory('BletagService', function($q) {
   // Might use a resource here that returns a JSON array
 
   // Some fake testing data
@@ -43,7 +43,10 @@ angular.module('starter.services', [])
 
   return {
     discoveredDevice: function() {
-      return devices;
+      console.log("discover...");
+      var defered = $q.defer();
+      discoverDevices(defered);
+      return defered.promise;
     },
     allCensorValue: function() {
       return censorValues;

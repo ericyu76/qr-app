@@ -3,6 +3,9 @@
 angular.module('starter.controllers', [])
 
 .controller('QRCtrl', function($scope, QRService) {
+
+	var myurl = "";
+
 	$scope.doScan = function(){
 		
 		$scope.scanResult0 = '';
@@ -13,6 +16,7 @@ angular.module('starter.controllers', [])
 			function(result) {
 				$scope.scanResult0 = result[0];
 				$scope.scanResult1 = result[1];
+				myurl = result[0];
 			},
 			function(error) {
 				$scope.scanResult0 = error;
@@ -20,9 +24,9 @@ angular.module('starter.controllers', [])
 		);
 	};
 
-	$scope.openBrowser = function(url){
-		 console.log('startInAppBrowser: '+url);
-         var ref = window.open(url, '_blank', 'closebuttoncaption=完成,location=no,enableViewportScale=yes,toolbarposition=top');
+	$scope.openBrowser = function(){
+		 console.log('startInAppBrowser: '+myurl);
+         var ref = window.open(myurl, '_blank', 'closebuttoncaption=完成,location=no,enableViewportScale=yes,toolbarposition=top');
          ref.addEventListener('loadstart', function(event) { 
          	console.debug('start: ' + event.url); 
          });
@@ -35,7 +39,14 @@ angular.module('starter.controllers', [])
 })
 
 .controller('BletagCtrl', function($scope, BletagService) {
-  $scope.sensorResult = BletagService.discoveredDevice();
+    var promise = BletagService.discoveredDevice();
+	promise.then(
+		function(result) {
+			$scope.sensorResult = result;
+		},
+		function(error) {
+		}
+	);
 })
 
 .controller('FriendsCtrl', function($scope, Friends) {
