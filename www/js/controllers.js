@@ -45,6 +45,9 @@ angular.module('starter.controllers', [])
 			$scope.sensorResult = result;
 		},
 		function(error) {
+		},
+		function(result){
+			$scope.sensorResult = result;
 		}
 	);
 })

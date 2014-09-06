@@ -2,13 +2,24 @@ var addressKey = "address";
 
 var tiCensorTagDeviceGeneralUuid = "5F603DE9-1526-C526-0EB5-6F9857A6EBC0";
 
-var tempServiceUuid = "F000AA00-0451-4000-B000-000000000000";
-
 var heartRateServiceUuid = "180d";
 var heartRateMeasurementCharacteristicUuid = "2a37";
 var clientCharacteristicConfigDescriptorUuid = "2902";
 var batteryServiceUuid = "180f";
 var batteryLevelCharacteristicUuid = "2a19";
+
+//Ti Sensor Tag Services
+var unKnowServiceUuid='180A';
+var tempServiceUuid='F000AA00-0451-4000-B000-000000000000';
+var accelserviceUuid='F000AA10-0451-4000-B000-000000000000';
+var humidServiceUuid='F000AA20-0451-4000-B000-000000000000';
+var magnServiceUuid='F000AA30-0451-4000-B000-000000000000';
+var baromServiceUuid='F000AA40-0451-4000-B000-000000000000';
+var gyroServiceUuid='F000AA50-0451-4000-B000-000000000000';
+var keyStateServiceUuid='FFE0';
+var testServiceUuid='F000AA60-0451-4000-B000-000000000000';
+var connServiceUuid='F000CCC0-0451-4000-B000-000000000000';
+var imgIdentifyServiceUuid='F000FFC0-0451-4000-B000-000000000000';
 
 var scanTimer = null;
 var connectTimer = null;
@@ -66,14 +77,16 @@ function startScanSuccess(obj)
     console.log("scaned device:"+ obj.name +" rssi="+obj.rssi + " address=" +obj.address);
     var devices = 
     [{ id: 0, name: obj.name, address: obj.address, rssi:obj.rssi }];
-    myDefered.resolve(devices);
+    myDefered.notify(devices);
     console.log("Stopping scan..");
     bluetoothle.stopScan(stopScanSuccess, stopScanError);
     clearScanTimeout();
-    return myDefered.promise;
+    
 
     // window.localStorage.setItem(addressKey, obj.address);
-    //     connectDevice(obj.address);
+    connectDevice(obj.address);
+
+    return myDefered.promise;
   }
   else if (obj.status == "scanStarted")
   {
@@ -217,9 +230,9 @@ function reconnectSuccess(obj)
 
     if (window.device.platform == iOSPlatform)
     {
-      console.log("Discovering heart rate service");
-      var paramsObj = {"serviceUuids":[heartRateServiceUuid]};
-      bluetoothle.services(servicesHeartSuccess, servicesHeartError, paramsObj);
+      console.log("Discovering services...");
+      var paramsObj = {"serviceUuids":[]};
+      bluetoothle.services(servicesServicesSuccess, servicesHeartError, paramsObj);
     }
     else if (window.device.platform == androidPlatform)
     {
@@ -258,23 +271,25 @@ function clearReconnectTimeout()
   }
 }
 
-function servicesHeartSuccess(obj)
+function servicesServicesSuccess(obj)
 {
   if (obj.status == "discoveredServices")
   {
     var serviceUuids = obj.serviceUuids;
+
+    console.log("Finding characteristics");
+    // 找到全部的 characteristics
     for (var i = 0; i < serviceUuids.length; i++)
     {
       var serviceUuid = serviceUuids[i];
 
-      if (serviceUuid == heartRateServiceUuid)
-      {
-        console.log("Finding heart rate characteristics");
-        var paramsObj = {"serviceUuid":heartRateServiceUuid, "characteristicUuids":[heartRateMeasurementCharacteristicUuid]};
-        bluetoothle.characteristics(characteristicsHeartSuccess, characteristicsHeartError, paramsObj);
-        return;
-      }
+      // console.log("Found ServiceUuid: "+serviceUuid);
+        var paramsObj = {"serviceUuid":heartRateServiceUuid, 
+        "characteristicUuids":[heartRateMeasurementCharacteristicUuid]};
+        // bluetoothle.characteristics(characteristicsHeartSuccess, characteristicsHeartError, paramsObj);
+        
     }
+    return;
     console.log("Error: heart rate service not found");
   }
     else
