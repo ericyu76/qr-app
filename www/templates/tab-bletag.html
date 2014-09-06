@@ -1,0 +1,10 @@
+<ion-view title="感測器">
+  <ion-content class="has-header">
+    <h2> 找到的裝置 </h2>
+    <ion-list>
+      <ion-item ng-repeat="device in sensorResult" type="item-text-wrap">
+        {{device.name}} --> RSSI: {{device.rssi}}
+      </ion-item>
+    </ion-list>
+  </ion-content>
+</ion-view>

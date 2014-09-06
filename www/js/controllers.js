@@ -29,7 +29,13 @@ angular.module('starter.controllers', [])
 	};
 })
 
+
+
 .controller('DashCtrl', function($scope) {
+})
+
+.controller('BletagCtrl', function($scope, BletagService) {
+  $scope.sensorResult = BletagService.discoveredDevice();
 })
 
 .controller('FriendsCtrl', function($scope, Friends) {

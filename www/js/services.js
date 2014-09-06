@@ -27,6 +27,30 @@ angular.module('starter.services', [])
   };
 })
 
+.factory('BletagService', function() {
+  // Might use a resource here that returns a JSON array
+
+  // Some fake testing data
+  var censorValues = [
+    { id: 0, name: '環境温度', value:30 },
+    { id: 1, name: '紅外線温度', value:30 },
+    { id: 2, name: '水平儀', value:-1 }
+  ];
+
+  var devices = [
+    { id: 0, name: 'TiTag', address: "aaa", rssi:30 }
+  ];
+
+  return {
+    discoveredDevice: function() {
+      return devices;
+    },
+    allCensorValue: function() {
+      return censorValues;
+    }
+  };
+})
+
 .factory('QRService', function($q) {
   return {
     scan: function(){

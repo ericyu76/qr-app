@@ -28,6 +28,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
   // Set up the various states which the app can be in.
   // Each state's controller can be found in controllers.js
   $stateProvider
+    // Each tab has its own nav history stack:
 
     // setup an abstract state for the tabs directive
     .state('tab', {
@@ -35,8 +36,6 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
       abstract: true,
       templateUrl: "templates/tabs.html"
     })
-
-    // Each tab has its own nav history stack:
 
     .state('tab.dash', {
       url: '/dash',
@@ -48,15 +47,26 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
       }
     })
 
-    .state('tab.friends', {
-      url: '/friends',
+    .state('tab.bletag', {
+      url: '/bletag',
       views: {
-        'tab-friends': {
-          templateUrl: 'templates/tab-friends.html',
-          controller: 'FriendsCtrl'
+        'tab-bletag': {
+          templateUrl: 'templates/tab-bletag.html',
+          controller: 'BletagCtrl'
         }
       }
     })
+
+    // .state('tab.friends', {
+    //   url: '/friends',
+    //   views: {
+    //     'tab-friends': {
+    //       templateUrl: 'templates/tab-friends.html',
+    //       controller: 'FriendsCtrl'
+    //     }
+    //   }
+    // })
+
     .state('tab.friend-detail', {
       url: '/friend/:friendId',
       views: {
