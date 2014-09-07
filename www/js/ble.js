@@ -1,3 +1,6 @@
+/* global  bluetoothle, setTimeout, clearTimeout,window */
+'use strict';
+
 var addressKey = "address";
 
 var tiCensorTagDeviceGeneralUuid = "5F603DE9-1526-C526-0EB5-6F9857A6EBC0";
@@ -9,17 +12,29 @@ var batteryServiceUuid = "180f";
 var batteryLevelCharacteristicUuid = "2a19";
 
 //Ti Sensor Tag Services
-var unKnowServiceUuid='180A';
-var tempServiceUuid='F000AA00-0451-4000-B000-000000000000';
-var accelserviceUuid='F000AA10-0451-4000-B000-000000000000';
-var humidServiceUuid='F000AA20-0451-4000-B000-000000000000';
-var magnServiceUuid='F000AA30-0451-4000-B000-000000000000';
-var baromServiceUuid='F000AA40-0451-4000-B000-000000000000';
-var gyroServiceUuid='F000AA50-0451-4000-B000-000000000000';
-var keyStateServiceUuid='FFE0';
-var testServiceUuid='F000AA60-0451-4000-B000-000000000000';
-var connServiceUuid='F000CCC0-0451-4000-B000-000000000000';
-var imgIdentifyServiceUuid='F000FFC0-0451-4000-B000-000000000000';
+
+var service = {
+  serviceUuid: '',
+  serviceDesc: '',
+  characteristicsUuids: [],
+  descriptors: ''
+};
+
+var bleServices =[];
+
+var deviceInfoServiceUuid='180a';
+var tempServiceUuid='f000aa00-0451-4000-b000-000000000000';
+var accelserviceUuid='f000aa10-0451-4000-b000-000000000000';
+var humidServiceUuid='f000aa20-0451-4000-b000-000000000000';
+var magnServiceUuid='f000aa30-0451-4000-b000-000000000000';
+var baromServiceUuid='f000aa40-0451-4000-b000-000000000000';
+var gyroServiceUuid='f000aa50-0451-4000-b000-000000000000';
+var keyStateServiceUuid='ffe0';
+var testServiceUuid='f000aa60-0451-4000-b000-000000000000';
+var connServiceUuid='f000ccc0-0451-4000-b000-000000000000';
+var imgIdentifyServiceUuid='f000ffc0-0451-4000-b000-000000000000';
+
+var tempServiceUuidNotifyCharcUuid = 'f000aa01-0451-4000-b000-000000000000';
 
 var scanTimer = null;
 var connectTimer = null;
@@ -85,8 +100,6 @@ function startScanSuccess(obj)
 
     // window.localStorage.setItem(addressKey, obj.address);
     connectDevice(obj.address);
-
-    return myDefered.promise;
   }
   else if (obj.status == "scanStarted")
   {
@@ -279,24 +292,24 @@ function servicesServicesSuccess(obj)
 
     console.log("Finding characteristics");
     // 找到全部的 characteristics
-    for (var i = 0; i < serviceUuids.length; i++)
-    {
+    for(var i=0; i < serviceUuids.length; i++){
       var serviceUuid = serviceUuids[i];
-
-      // console.log("Found ServiceUuid: "+serviceUuid);
-        var paramsObj = {"serviceUuid":heartRateServiceUuid, 
-        "characteristicUuids":[heartRateMeasurementCharacteristicUuid]};
-        // bluetoothle.characteristics(characteristicsHeartSuccess, characteristicsHeartError, paramsObj);
-        
+      if(serviceUuid.toUpperCase() == tempServiceUuid.toUpperCase()){
+          bleServices.push(service);
+          var paramsObj = {"serviceUuid":tempServiceUuid, 
+          "characteristicUuids":[]};
+          bluetoothle.characteristics(characteristicsSuccess, characteristicsHeartError, paramsObj);
+          return;
+      }
     }
-    return;
+    
     console.log("Error: heart rate service not found");
   }
     else
   {
     console.log("Unexpected services heart status: " + obj.status);
   }
-  disconnectDevice();
+  //disconnectDevice();
 }
 
 function servicesHeartError(obj)
@@ -305,30 +318,35 @@ function servicesHeartError(obj)
   disconnectDevice();
 }
 
-function characteristicsHeartSuccess(obj)
+function characteristicsSuccess(obj)
 {
   if (obj.status == "discoveredCharacteristics")
   {
+    console.log("in discoveredCharacteristics");
     var characteristicUuids = obj.characteristicUuids;
+    var serviceUuid = obj.serviceUuid;
     for (var i = 0; i < characteristicUuids.length; i++)
     {
-      console.log("Heart characteristics found, now discovering descriptor");
+      console.log("Characteristics found: "+ characteristicUuids[i]);
       var characteristicUuid = characteristicUuids[i];
 
-      if (characteristicUuid == heartRateMeasurementCharacteristicUuid)
-      {
-        var paramsObj = {"serviceUuid":heartRateServiceUuid, "characteristicUuid":heartRateMeasurementCharacteristicUuid};
-        bluetoothle.descriptors(descriptorsHeartSuccess, descriptorsHeartError, paramsObj);
-        return;
+      if(characteristicUuid == tempServiceUuidNotifyCharcUuid){
+          //bluetoothle.descriptors(descriptorsHeartSuccess, descriptorsHeartError, paramsObj);
+
+          console.log("Subscribing to heart rate for 50 seconds");
+          var paramsObj = {"serviceUuid":serviceUuid, "characteristicUuid":tempServiceUuidNotifyCharcUuid};
+          bluetoothle.subscribe(subscribeSuccess, subscribeError, paramsObj);
+          //setTimeout(unsubscribeDevice, 50000);
+          return;
       }
     }
-    console.log("Error: Heart rate measurement characteristic not found.");
+    console.log("Error: Temperature measurement characteristic not found.");
   }
     else
   {
     console.log("Unexpected characteristics heart status: " + obj.status);
   }
-  disconnectDevice();
+  // disconnectDevice();
 }
 
 function characteristicsHeartError(obj)
@@ -477,10 +495,10 @@ function subscribeSuccess(obj)
 {   
     if (obj.status == "subscribedResult")
     {
-        console.log("Subscription data received");
-
+        console.log("Subscription data received, value="+ obj.value);
         //Parse array of int32 into uint8
         var bytes = bluetoothle.encodedStringToBytes(obj.value);
+
 
         //Check for data
         if (bytes.length === 0)
@@ -506,7 +524,7 @@ function subscribeSuccess(obj)
             var u8 = new Uint8Array(u8bytes)[0];
             hr = u8;
         }
-        console.log("Heart Rate: " + hr);
+        console.log("Temperature: " + hr);
     }
     else if (obj.status == "subscribed")
     {
@@ -515,7 +533,7 @@ function subscribeSuccess(obj)
     else
   {
     console.log("Unexpected subscribe status: " + obj.status);
-    disconnectDevice();
+    //disconnectDevice();
   }
 }
 
@@ -530,6 +548,7 @@ function unsubscribeDevice()
   console.log("Unsubscribing heart service");
   var paramsObj = {"serviceUuid":heartRateServiceUuid, "characteristicUuid":heartRateMeasurementCharacteristicUuid};
   bluetoothle.unsubscribe(unsubscribeSuccess, unsubscribeError, paramsObj);
+  return myDefered.promise;
 }
 
 function unsubscribeSuccess(obj)
