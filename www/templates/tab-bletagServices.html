@@ -1,0 +1,10 @@
+<ion-view title="感測器">
+  <ion-content class="has-header">
+    <h2> 服務清單 </h2>
+    <ion-list>
+         <a class="item item-icon-left" ng-repeat="service in serivces">
+		    <i class="icon ion-thermometer"></i>
+		    {{service.desc}} {{service.value}} 度C</a>
+    </ion-list>
+  </ion-content>
+</ion-view>

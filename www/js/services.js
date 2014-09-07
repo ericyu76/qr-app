@@ -38,18 +38,34 @@ angular.module('starter.services', [])
   ];
 
   var devices = [
-    { id: 0, name: 'TiTag', address: "aaa", rssi:30 }
+    { id: 1, name: 'TiTag', address: "aaa", rssi:30 }
   ];
+
+  var services = [];
 
   return {
     discoveredDevice: function() {
+      // init devices
+
+      // start scan all device
       console.log("discover...");
       var defered = $q.defer();
       discoverDevices(defered);
       return defered.promise;
     },
+    testDevices: function() { // for html test only
+      return devices;
+    },
     allCensorValue: function() {
       return censorValues;
+    },
+    getServices:function(tagId){
+      // get all services
+      var services = [{uuid: 'ABCDEF-1010', desc: '環境温度', value: 31},
+      {uuid: 'ABCDEF-1012', desc: '紅外線温度', value: 31},
+      {uuid: 'ABCDEF-1012', desc: '氣壓', value: 31},
+      {uuid: 'ABCDEF-1012', desc: '濕度', value: 31}];
+      return services;
     }
   };
 })

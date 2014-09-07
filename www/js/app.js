@@ -47,11 +47,21 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
       }
     })
 
-    .state('tab.bletag', {
-      url: '/bletag',
+    .state('tab.bletags', {
+      url: '/bletags',
       views: {
-        'tab-bletag': {
-          templateUrl: 'templates/tab-bletag.html',
+        'tab-bletags': {
+          templateUrl: 'templates/tab-bletags.html',
+          controller: 'BletagsCtrl'
+        }
+      }
+    })
+
+    .state('tab.bletagServices', {
+      url: '/bletagServices/:tagId',
+      views: {
+        'tab-bletags': {
+          templateUrl: 'templates/tab-bletagServices.html',
           controller: 'BletagCtrl'
         }
       }

@@ -38,7 +38,10 @@ angular.module('starter.controllers', [])
 .controller('DashCtrl', function($scope) {
 })
 
-.controller('BletagCtrl', function($scope, BletagService) {
+.controller('BletagsCtrl', function($scope, BletagService) {
+	//for html ui test
+	// $scope.sensorResult = BletagService.testDevices();
+    
     var promise = BletagService.discoveredDevice();
 	promise.then(
 		function(result) {
@@ -50,6 +53,10 @@ angular.module('starter.controllers', [])
 			$scope.sensorResult = result;
 		}
 	);
+})
+
+.controller('BletagCtrl', function($scope, $stateParams, BletagService) {
+    $scope.serivces = BletagService.getServices($stateParams.tagId);
 })
 
 .controller('FriendsCtrl', function($scope, Friends) {
