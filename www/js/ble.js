@@ -34,7 +34,8 @@ var testServiceUuid='f000aa60-0451-4000-b000-000000000000';
 var connServiceUuid='f000ccc0-0451-4000-b000-000000000000';
 var imgIdentifyServiceUuid='f000ffc0-0451-4000-b000-000000000000';
 
-var tempServiceUuidNotifyCharcUuid = 'f000aa01-0451-4000-b000-000000000000';
+var tempServiceNotifyCharcUuid = 'f000aa01-0451-4000-b000-000000000000';
+var tempServiceCtrlCharcUuid = 'f000aa02-0451-4000-b000-000000000000';
 
 var scanTimer = null;
 var connectTimer = null;
@@ -330,13 +331,20 @@ function characteristicsSuccess(obj)
       console.log("Characteristics found: "+ characteristicUuids[i]);
       var characteristicUuid = characteristicUuids[i];
 
-      if(characteristicUuid == tempServiceUuidNotifyCharcUuid){
-          //bluetoothle.descriptors(descriptorsHeartSuccess, descriptorsHeartError, paramsObj);
+      if(characteristicUuid == tempServiceNotifyCharcUuid){
+
+          //write 0x01 to turn on the notify
+          var writevalue = bluetoothle.bytesToEncodedString([0x01]);
+          var writeParamsObj = {"value": writevalue, 
+                                   "serviceUuid":serviceUuid, 
+                                   "characteristicUuid":tempServiceCtrlCharcUuid};
+          bluetoothle.write(writeSuccess, writeError, writeParamsObj);
+
 
           console.log("Subscribing to heart rate for 50 seconds");
-          var paramsObj = {"serviceUuid":serviceUuid, "characteristicUuid":tempServiceUuidNotifyCharcUuid};
+          var paramsObj = {"serviceUuid":serviceUuid, "characteristicUuid":tempServiceNotifyCharcUuid};
           bluetoothle.subscribe(subscribeSuccess, subscribeError, paramsObj);
-          //setTimeout(unsubscribeDevice, 50000);
+          setTimeout(unsubscribeDevice, 50000);
           return;
       }
     }
@@ -352,6 +360,17 @@ function characteristicsSuccess(obj)
 function characteristicsHeartError(obj)
 {
   console.log("Characteristics heart error: " + obj.error + " - " + obj.message);
+  disconnectDevice();
+}
+
+
+function writeSuccess(obj){
+  console.log("Write success. "+ obj.status);
+}
+
+function writeError(obj){
+  thisDeferred.reject('(01)藍牙寫入失敗');
+  console.log("Write error: " + obj.error + " - " + obj.message);
   disconnectDevice();
 }
 
