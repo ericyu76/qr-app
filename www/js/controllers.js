@@ -2,7 +2,7 @@
 'use strict';
 angular.module('starter.controllers', [])
 
-.controller('QRCtrl', function($scope, QRService) {
+.controller('QRCtrl', function($scope, QRService,Utils) {
 
 	var myurl = "";
 
@@ -17,6 +17,20 @@ angular.module('starter.controllers', [])
 				$scope.scanResult0 = result[0];
 				$scope.scanResult1 = result[1];
 				myurl = result[0];
+				var scanResult = {
+					scanDate: Utils.getDateFormatStr(new Date()),
+					resultValue: result[0],
+					resultType: result[1]
+				};
+
+				var qrHistoryData = [];
+				var qrHistoryStr = localStorage.getItem("qrHistoryData");
+				if(qrHistoryStr !== null){
+					qrHistoryData = JSON.parse(qrHistoryStr);
+				}
+				qrHistoryData.push(scanResult);
+				localStorage.setItem('qrHistoryData',angular.toJson(qrHistoryData));
+
 			},
 			function(error) {
 				$scope.scanResult0 = error;
@@ -31,6 +45,28 @@ angular.module('starter.controllers', [])
          	console.debug('start: ' + event.url); 
          });
 	};
+})
+
+.controller('QRHisCtrl', function($scope) {
+	var qrHistoryData = null;
+	var qrHistoryStr = localStorage.getItem("qrHistoryData");
+	if(qrHistoryStr !== null){
+		qrHistoryData = JSON.parse(qrHistoryStr);
+	}
+	$scope.qrHistoryData = qrHistoryData;
+
+})
+
+.controller('QRRecCtrl', function($scope,$stateParams) {
+	var qrHistoryData = null;
+	var qrHistoryStr = localStorage.getItem("qrHistoryData");
+	if(qrHistoryStr !== null){
+		qrHistoryData = JSON.parse(qrHistoryStr);
+		var scanResult = qrHistoryData[$stateParams.arrayIndex];
+		$scope.scanDate = scanResult.scanDate;
+		$scope.resultValue = scanResult.resultValue;
+	}
+
 })
 
 

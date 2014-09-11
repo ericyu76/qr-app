@@ -27,6 +27,16 @@ angular.module('starter.services', [])
   };
 })
 
+.factory('Utils', function() {
+  return {
+    getDateFormatStr: function(date) {
+      var str = date.getFullYear() + "-" + ("0"+(date.getMonth() + 1)).slice(-2) + "-" + ("0"+date.getDate()).slice(-2) + " " +
+      ("0"+date.getHours()).slice(-2) + ":" + ("0"+date.getMinutes()).slice(-2) + ":" + ("0"+date.getSeconds()).slice(-2);
+      return str;
+    }
+  };
+})
+
 .factory('BletagService', function($q) {
   // Might use a resource here that returns a JSON array
 
@@ -90,6 +100,10 @@ angular.module('starter.services', [])
             '2DScanning' : true}]
        );
       return deferred.promise;
+    },
+    qrHistory: function(){
+
+
     }
   };
 })

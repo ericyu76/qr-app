@@ -67,6 +67,26 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
       }
     })
 
+    .state('tab.qrhistory', {
+      url: '/qrhistory',
+      views: {
+        'tab-dash': {
+          templateUrl: 'templates/tab-qrHistory.html',
+          controller: 'QRHisCtrl'
+        }
+      }
+    })
+
+    .state('tab.qrrecord', {
+      url: '/qrrecord/:arrayIndex',
+      views: {
+        'tab-dash': {
+          templateUrl: 'templates/tab-qrRecord.html',
+          controller: 'QRRecCtrl'
+        }
+      }
+    })
+
     // .state('tab.friends', {
     //   url: '/friends',
     //   views: {

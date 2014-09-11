@@ -47,8 +47,8 @@ var myDefered;
 
 function discoverDevices(defered){
   myDefered = defered;
-
-  bluetoothle.initialize(initializeSuccess, initializeError);
+  var param = {"request":true};
+  bluetoothle.initialize(initializeSuccess, initializeError, param);
 }
 
 
@@ -517,6 +517,7 @@ function subscribeSuccess(obj)
         console.log("Subscription data received, value="+ obj.value);
         //Parse array of int32 into uint8
         var bytes = bluetoothle.encodedStringToBytes(obj.value);
+        console.log(bytes);
 
 
         //Check for data
