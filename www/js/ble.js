@@ -47,8 +47,32 @@ var myDefered;
 
 function discoverDevices(defered){
   myDefered = defered;
-  var param = {"request":true};
-  bluetoothle.initialize(initializeSuccess, initializeError, param);
+  bluetoothle.isInitialized(isInitializedCallback);
+}
+
+function isInitializedCallback(obj){
+  var isInitialized = obj.isInitalized;
+  if(isInitialized){
+    var address = window.localStorage.getItem(addressKey);
+    // not to remember address
+    address = null;
+
+    if (address === null)
+    { 
+        console.log("No existed address, start to initial ble.");
+        console.log("Bluetooth initialized successfully, starting scan for censor devices.");
+        var paramsObj = {"serviceUuids":[]}; //left blank to sscan all
+        bluetoothle.startScan(startScanSuccess, startScanError, paramsObj);
+    }
+    else
+    {
+        console.log("connect to address: "+address);
+        connectDevice(address);
+    }
+  }else{
+    var param = {"request":true};
+    bluetoothle.initialize(initializeSuccess, initializeError, param);
+  }
 }
 
 
